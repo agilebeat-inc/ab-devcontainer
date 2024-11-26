@@ -1,4 +1,4 @@
-# THIS I S A TEST
+
 FROM tensorflow/tensorflow:latest-gpu
 
 LABEL maintainer Marek Dwulit<Marek.Dwulit@agilebeat.com>”
