@@ -11,7 +11,9 @@ RUN apt-get -y install sudo vim mc git wget gcc g++
 RUN cp /usr/lib/python3/dist-packages/apt_pkg.cpython-310-x86_64-linux-gnu.so /usr/lib/python3/dist-packages/apt_pkg.so
 RUN apt-get -y install gnome-terminal --fix-missing
 RUN apt-get -y install apt-transport-https ca-certificates curl gnupg-agent software-properties-common jq 
-
+RUN wget https://github.com/mikefarah/yq/releases/download/v4.34.1/yq_linux_amd64 -O yq && \
+    chmod +x yq  && \
+    mv yq /usr/local/bin/yq
 RUN rm -rf /etc/apt/sources.list.d/cuda.list
 RUN rm -rf /etc/apt/sources.list.d/nvidia-ml.list
 RUN apt-key del 7fa2af80 && \ 
