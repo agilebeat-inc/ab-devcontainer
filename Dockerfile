@@ -32,7 +32,7 @@ RUN pip install --upgrade numpy
 RUN pip --no-cache-dir install awscli opencv-python Pillow tensorflowjs
 
 # https://deb.nodesource.com/setup_12.x is a bash script that prepares for installing NodeJS
-RUN curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs
+RUN curl -sL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs
 
 RUN npm install -g @vue/cli
 RUN npm install -g npm@latest
