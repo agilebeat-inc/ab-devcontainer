@@ -80,13 +80,14 @@ ENV GOROOT /usr/local/go
 ENV PATH /usr/local/go/bin:$PATH
 
 RUN rm -rf /usr/local/go && \
-    curl --silent --location "https://go.dev/dl/go1.21.4.linux-amd64.tar.gz" | tar xz -C /usr/local && \
-    sed -i '19iexport PATH=$PATH:/usr/local/go/bin' /etc/bash.bashrc && \
-    sed '19i# Add deafult path for go' /etc/bash.bashrc && \
-    GOPATH=/usr/local/go /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest && \
-    GOPATH=/usr/local/go /usr/local/go/bin/go install -v github.com/go-delve/delve/cmd/dlv@latest && \
-    GOPATH=/usr/local/go /usr/local/go/bin/go install -v sigs.k8s.io/kind@v0.24.0 && \
-    GOPATH=/usr/local/go /usr/local/go/bin/go install -v github.com/derailed/k9s@latest
+    curl --silent --location "https://go.dev/dl/go1.23.5.linux-amd64.tar.gz" | tar xz -C /usr/local 
+
+RUN GOPATH=/usr/local/go /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest 
+RUN GOPATH=/usr/local/go /usr/local/go/bin/go install -v github.com/go-delve/delve/cmd/dlv@latest
+RUN GOPATH=/usr/local/go /usr/local/go/bin/go install -v sigs.k8s.io/kind@v0.26.0
+
+RUN sed -i '19iexport PATH=$PATH:/usr/local/go/bin' /etc/bash.bashrc && \
+    sed -i '19i# Add deafult path for go' /etc/bash.bashrc
 
 # ********************************************************
 # * Install go                                           *
@@ -159,21 +160,9 @@ RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.co
 
 
 # ********************************************************
-# * Install hashicorp packer                             *
-# ********************************************************
-
-RUN wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
-    echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list && \
-    sudo apt update && sudo apt install packer && \
-    packer plugins install github.com/hashicorp/amazon
-# ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
 
 
-
-
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $HOST_USERNAME
-
-RUN packer plugins install github.com/hashicorp/amazon
