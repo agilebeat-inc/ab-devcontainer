@@ -82,9 +82,9 @@ ENV PATH /usr/local/go/bin:$PATH
 RUN rm -rf /usr/local/go && \
     curl --silent --location "https://go.dev/dl/go1.23.5.linux-amd64.tar.gz" | tar xz -C /usr/local 
 
-RUN GOPATH=/usr/local/go /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest 
-RUN GOPATH=/usr/local/go /usr/local/go/bin/go install -v github.com/go-delve/delve/cmd/dlv@latest
-RUN GOPATH=/usr/local/go /usr/local/go/bin/go install -v sigs.k8s.io/kind@v0.26.0
+RUN sleep 10 && GOPATH=/usr/local/go /usr/local/go/bin/go install -v golang.org/x/tools/gopls@latest 
+RUN sleep 8 && GOPATH=/usr/local/go /usr/local/go/bin/go install -v github.com/go-delve/delve/cmd/dlv@latest
+RUN sleep 11 && GOPATH=/usr/local/go /usr/local/go/bin/go install -v sigs.k8s.io/kind@v0.26.0
 
 RUN sed -i '19iexport PATH=$PATH:/usr/local/go/bin' /etc/bash.bashrc && \
     sed -i '19i# Add deafult path for go' /etc/bash.bashrc
