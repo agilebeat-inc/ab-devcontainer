@@ -27,7 +27,7 @@
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ms-toolsai.jupyter",
-                "ms-ossdata.vscode-postgresql",
+                "ms-ossdata.vscode-pgsql",
                 "golang.go",
                 "ms-kubernetes-tools.vscode-kubernetes-tools"
             ]
