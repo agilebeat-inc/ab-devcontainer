@@ -38,6 +38,11 @@ RUN npm install -g @vue/cli
 RUN npm install -g npm@latest
 RUN npm install -g yarn
 RUN npm install -g serve
+
+# RUN uv installation
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # RUN npm config set unsafe-perm=true npm 12.x
 
 RUN pip install --upgrade pip
