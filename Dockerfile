@@ -110,12 +110,6 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
     curl -Lo "/tmp/kubectl.sha256" "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
     echo "$(cat /tmp/kubectl.sha256)  /tmp/kubectl" | sha256sum --check && mv /tmp/kubectl /usr/local/bin && chmod 755 /usr/local/bin/kubectl
 
-RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null && \
-    sudo apt-get install apt-transport-https --yes && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list && \
-    sudo apt-get update && \
-    sudo apt-get install helm
-
 # ********************************************************
 # * Install operator-sdk                                 *
 # ********************************************************
@@ -149,12 +143,9 @@ RUN apt-get -y install iproute2 bind9-dnsutils postgresql-client telnet net-tool
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null && \
-    sudo apt-get install apt-transport-https --yes && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list && \
-    sudo apt-get update && \
-    sudo apt-get install helm
-
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
+    chmod 700 get_helm.sh && \
+    ./get_helm.sh
 
 # ********************************************************
 # * Install yq                                           *
