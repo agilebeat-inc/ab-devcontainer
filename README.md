@@ -1,8 +1,12 @@
 # ab-devcontainer project
 
+## Project 
+
 ### Add to new project
 
-```git submodule add -b dev https://github.com/agilebeat-inc/ab-devcontainer.git .devcontainer```
+```sh
+git submodule add -b dev https://github.com/agilebeat-inc/ab-devcontainer.git .devcontainer
+```
 
 It is a template for devcontainer configuration
 
@@ -17,8 +21,8 @@ The Dev Containers extension provides out of the box support for using local Git
 
 If you do not have your user name or email address set up locally, you may be prompted to do so. You can do this on your local machine by running the following commands:
 
-```
-git config --global user.name "Your Name"
+```sh
+git config --global user.name "Your Name" && \
 git config --global user.email "your.email@address"
 ```
 The extension will automatically copy your local .gitconfig file into the container on startup so you should not need to do this in the container itself.
