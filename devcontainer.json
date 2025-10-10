@@ -29,7 +29,8 @@
                 "ms-toolsai.jupyter",
                 "ms-ossdata.vscode-pgsql",
                 "golang.go",
-                "ms-kubernetes-tools.vscode-kubernetes-tools"
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                "Continue.continue"
             ]
         }
     },
