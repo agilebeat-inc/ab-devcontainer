@@ -1,0 +1,21 @@
+# requirements for pip installation
+awscli
+boto3
+# geopandas
+# geopy
+# matplotlib
+mysql-connector-python
+# neo4j
+numpy
+pandas
+# psycopg
+# pymilvus
+# ML packages
+# tensorflow 
+# torch 
+# torchvision 
+# torchaudio 
+# transformers 
+# opencv-python 
+# Pillow 
+# tensorflowjs
