@@ -38,13 +38,6 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
 # currently, this isn't used - perhaps we should use uv to install rather than pip in the next layer..
 # RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# install python dependencies - should this be containerized?
-ARG VENV_PATH=${HOST_HOME}/pythonenv
-COPY pip-requirements.txt .
-RUN python3 -m venv ${VENV_PATH} && \
-    ${VENV_PATH}/bin/python -m pip install --upgrade pip && \
-    ${VENV_PATH}/bin/python -m pip install -r pip-requirements.txt
-
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
 # ********************************************************
@@ -127,6 +120,13 @@ RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/s
 RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
     chmod a+x /tmp/yq_linux_amd64/yq_linux_amd64 && \
     mv /tmp/yq_linux_amd64/yq_linux_amd64 /usr/local/bin/yq
+
+# install python dependencies - this should be done in a venv
+ARG VENV_PATH=${HOST_HOME}/pythonenv
+COPY pip-requirements.txt .
+RUN python3 -m venv ${VENV_PATH} && \
+    ${VENV_PATH}/bin/python -m pip install --upgrade pip && \
+    ${VENV_PATH}/bin/python -m pip install -r pip-requirements.txt
 
 # ********************************************************
 # * Anything else you want to do like clean up goes here *

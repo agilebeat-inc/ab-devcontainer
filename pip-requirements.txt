@@ -8,6 +8,7 @@ mysql-connector-python
 # neo4j
 numpy
 pandas
+pyyaml
 # psycopg
 # pymilvus
 # ML packages

@@ -1,8 +1,6 @@
 {
     "name": "${localWorkspaceFolderBasename}",
     "dockerFile": "Dockerfile",
-    //"workspaceFolder": "/Users/mdwulit/workspace/e-commerce/trail-bakery",
-    // Use 'settings' to set *default* container specific settings.json values on container create. 
 
     "customizations": {
         "vscode": {
@@ -21,14 +19,15 @@
             // Add the IDs of extensions you want installed when the container is created in the array below.
             "extensions": [
                 "dbaeumer.vscode-eslint",
-                "ms-vscode-remote.vscode-remote-extensionpack",
-                "ms-vscode-remote.remote-containers",
+                "golang.go",
                 "humao.rest-client",
+                "ms-ossdata.vscode-pgsql",
+                "ms-python.black-formatter",
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ms-toolsai.jupyter",
-                "ms-ossdata.vscode-pgsql",
-                "golang.go",
+                "ms-vscode-remote.remote-containers",
+                "ms-vscode-remote.vscode-remote-extensionpack",
                 "ms-kubernetes-tools.vscode-kubernetes-tools",
                 "Continue.continue"
             ]
@@ -37,12 +36,7 @@
     
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [3001, 3306, 8983, 9001],
-
-    // Specifies a command that should be run after the container has been created.
-    // "postCreateCommand": "chown 1000 /var/run/docker.sock && mkdir -p .docker",
         
-    // Comment out the next line to run as root instead.
-    // "remoteUser": "node",
     "mounts": [
         "source=${localEnv:HOME}/.aws/credentials,target=/home/vscode/.aws/credentials,type=bind",
         "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind",
@@ -52,7 +46,7 @@
     "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=delegated ",
     "workspaceFolder": "${localWorkspaceFolder}",
     "remoteUser": "1000",
-    "postStartCommand": "sudo chown $(id -u).$(id -u) /var/run/docker.sock",
+    "postStartCommand": "sudo chown $(id -u):$(id -u) /var/run/docker.sock",
     "runArgs": [
         "--network=host"
     ]
