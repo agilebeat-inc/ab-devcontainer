@@ -52,7 +52,6 @@ RUN wget -O - https://apt.releases.hashicorp.com/gpg | \
 # ********************************************************
 # * Install go utils                                     *
 # ********************************************************
-
 # https://go.dev/ref/mod#go-install
 RUN go install -v golang.org/x/tools/gopls@latest && \
     go install -v sigs.k8s.io/kind@v0.30.0

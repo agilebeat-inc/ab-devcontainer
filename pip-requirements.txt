@@ -11,12 +11,3 @@ pandas
 pyyaml
 # psycopg
 # pymilvus
-# ML packages
-# tensorflow 
-# torch 
-# torchvision 
-# torchaudio 
-# transformers 
-# opencv-python 
-# Pillow 
-# tensorflowjs
