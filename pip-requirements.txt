@@ -1,6 +1,7 @@
 # requirements for pip installation
 awscli
 boto3
+ipykernel
 # geopandas
 # geopy
 # matplotlib
@@ -9,5 +10,6 @@ mysql-connector-python
 numpy
 pandas
 pyyaml
-# psycopg
+psycopg[binary]
 # pymilvus
+SQLAlchemy
