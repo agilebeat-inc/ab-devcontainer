@@ -4,11 +4,21 @@ LABEL maintainer="Marek Dwulit<Marek.Dwulit@agilebeat.com>"
 
 WORKDIR /tmp 
 
+# adding 
+# - locales-all since psql complains otherwise
+# - lsb-release so that terraform install command can identify the OS version
 RUN apt-get update && \
   apt-get install -y \ 
-  sudo vim mc git wget gcc g++ lsb-release \
-  python3-pip python3-venv \
-  apt-transport-https ca-certificates curl gnupg gnupg-agent jq
+  sudo vim git wget gcc g++ lsb-release locales-all \
+  python3-pip python3-venv postgresql-client jq \
+  apt-transport-https ca-certificates curl gnupg gnupg-agent
+
+# ********************************************************
+# * Add network troubleshooting on the container         *
+# ********************************************************
+RUN apt-get update && \
+    apt-get install -y \
+    bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute
 
 # installing Docker CLI
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -33,10 +43,6 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && useradd --uid $HOST_UID --gid $HOST_GID -m $HOST_USERNAME -d $HOST_HOME \
     && echo $HOST_USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$HOST_USERNAME \
     && chmod 0440 /etc/sudoers.d/$HOST_USERNAME
-
-# uv installation
-# currently, this isn't used - perhaps we should use uv to install rather than pip in the next layer..
-# RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
@@ -101,12 +107,6 @@ RUN export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n 
     mv /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
 
 # ********************************************************
-# * Add network troubleshooting on the container         *
-# ********************************************************
-RUN apt-get update && \
-    apt-get install -y iproute2 bind9-dnsutils postgresql-client telnet net-tools inetutils-* nmap
-
-# ********************************************************
 # * Install helm                                         *
 # ********************************************************
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
@@ -120,17 +120,13 @@ RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.co
     chmod a+x /tmp/yq_linux_amd64/yq_linux_amd64 && \
     mv /tmp/yq_linux_amd64/yq_linux_amd64 /usr/local/bin/yq
 
-# install python dependencies - this should be done in a venv
+# install python dependencies - into a dedicated venv
+# the only downside here is that installing additional packages from inside container is tricky
 ARG VENV_PATH=${HOST_HOME}/pythonenv
 COPY pip-requirements.txt .
 RUN python3 -m venv ${VENV_PATH} && \
     ${VENV_PATH}/bin/python -m pip install --upgrade pip && \
     ${VENV_PATH}/bin/python -m pip install -r pip-requirements.txt
-
-# ********************************************************
-# * Anything else you want to do like clean up goes here *
-# ********************************************************
-
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $HOST_USERNAME
