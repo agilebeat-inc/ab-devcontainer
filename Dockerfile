@@ -138,7 +138,7 @@ RUN export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n 
 # * Add network troubleshooting on the container         *
 # ********************************************************
 
-RUN apt-get -y install iproute2 bind9-dnsutils postgresql-client telnet net-tools inetutils-* nmap --fix-missing
+RUN apt-get update -y && apt-get -y install iproute2 bind9-dnsutils postgresql-client telnet net-tools inetutils-* nmap --fix-missing
 
 # ********************************************************
 # * Install helm                                         *
