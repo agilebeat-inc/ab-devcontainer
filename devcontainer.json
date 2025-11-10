@@ -50,6 +50,7 @@
     "remoteUser": "1000",
     "postStartCommand": "sudo chown $(id -u):$(id -u) /var/run/docker.sock",
     "runArgs": [
-        "--network=host"
+        "--network=host",
+        "--add-host", "gscloud.local:127.0.0.1"
     ]
 }
