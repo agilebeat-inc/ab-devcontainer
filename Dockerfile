@@ -9,9 +9,9 @@ WORKDIR /tmp
 # - lsb-release so that terraform install command can identify the OS version
 RUN apt-get update && \
   apt-get install -y \ 
-  sudo vim git wget gcc g++ lsb-release locales-all \
-  python3-pip python3-venv postgresql-client jq \
-  apt-transport-https ca-certificates curl gnupg gnupg-agent
+  curl gcc g++ git jq lsb-release less locales-all sudo vim wget \
+  postgresql-client python3-pip python3-venv \
+  apt-transport-https ca-certificates gnupg gnupg-agent
 
 # ********************************************************
 # * Add network troubleshooting on the container         *
