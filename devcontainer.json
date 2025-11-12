@@ -52,5 +52,16 @@
     "runArgs": [
         "--network=host",
         "--add-host", "gscloud.local:127.0.0.1"
-    ]
+    ],
+    "portsAttributes": {
+        "3306": {
+            "label": "mysql"
+        },
+        "5432": {
+            "label": "postgres"
+        },
+        "8080": {
+            "label": "geoserver"
+        }
+    }
 }
