@@ -29,7 +29,7 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     apt-get update && apt-get install -y docker-ce-cli
 
 # install node (is this needed when we have containers?)
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_25.x | bash - && \
     apt-get install -y nodejs
 
 ARG HOST_USERNAME=vscode
