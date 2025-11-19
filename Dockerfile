@@ -120,7 +120,22 @@ RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.co
     chmod a+x /tmp/yq_linux_amd64/yq_linux_amd64 && \
     mv /tmp/yq_linux_amd64/yq_linux_amd64 /usr/local/bin/yq
 
-# install python dependencies - into a dedicated venv
+# *********************************************************
+# * Install krew                                          *
+# https://krew.sigs.k8s.io/docs/user-guide/setup/install/ *
+# *********************************************************
+RUN cd "$(mktemp -d)" && \
+    OS=$(uname | tr '[:upper:]' '[:lower:]') && \
+    ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/') && \
+    KREW="krew-${OS}_${ARCH}" && \
+    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" && \
+    tar zxvf "${KREW}.tar.gz" && \
+    ./"${KREW}" install krew && \
+    echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> /home/$HOST_USERNAME/.bashrc
+# could also pre-install selected plugins:
+# RUN kubectl krew install rabbitmq
+
+# install python dependencies into a dedicated venv
 # the only downside here is that installing additional packages from inside container is tricky
 ARG VENV_PATH=${HOST_HOME}/pythonenv
 COPY pip-requirements.txt .
