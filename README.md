@@ -8,6 +8,12 @@
 git submodule add -b dev https://github.com/agilebeat-inc/ab-devcontainer.git .devcontainer
 ```
 
+or if .devcontainer is already in the index
+
+```
+git submodule update --init --recursive .devcontainer
+```
+
 It is a template for devcontainer configuration
 
 ### GitHub configuration
