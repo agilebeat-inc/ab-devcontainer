@@ -30,7 +30,8 @@
                 "ms-ossdata.vscode-pgsql",
                 "golang.go",
                 "ms-kubernetes-tools.vscode-kubernetes-tools",
-                "Continue.continue"
+                "Continue.continue",
+                "openai.chatgpt"
             ]
         }
     },
