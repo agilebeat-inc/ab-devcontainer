@@ -66,6 +66,6 @@
     ],
     "containerEnv": {
         // Set HOME_FOLDER_ON_HOST on the development cotainer with value as the path of the user's home directory on the host machine
-        "HOME_FOLDER_ON_HOST": "${localEnv:HOME}"
+        "DOCKER_HOME_FOLDER_ON_HOST": "${localEnv:HOME}"
     }
 }
