@@ -43,7 +43,7 @@
         "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube,type=bind",
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
         // optional: mount the directory where data dump is into the workspace container to be consistent with the Kind nodes
-        "source=${localEnv:HOME}/ab-workspace/r2p2/iaas-bioddex/playground/bioddex,target=/tmp/dump,type=bind"
+        "source=${localEnv:HOME}/ab-workspace/r2p2/iaas-bioddex/playground/btc,target=/tmp/dump,type=bind"
     ],
     "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=delegated ",
     "workspaceFolder": "${localWorkspaceFolder}",
