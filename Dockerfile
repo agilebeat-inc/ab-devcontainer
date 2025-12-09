@@ -7,18 +7,13 @@ WORKDIR /tmp
 # adding 
 # - locales-all since psql complains otherwise
 # - lsb-release so that terraform install command can identify the OS version
+# - networking utilties
 RUN apt-get update && \
   apt-get install -y \ 
   curl gcc g++ git jq lsb-release less locales-all sudo vim wget \
   postgresql-client python3-pip python3-venv \
-  apt-transport-https ca-certificates gnupg gnupg-agent
-
-# ********************************************************
-# * Add network troubleshooting on the container         *
-# ********************************************************
-RUN apt-get update && \
-    apt-get install -y \
-    bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute
+  apt-transport-https ca-certificates gnupg gnupg-agent \
+  bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute
 
 # installing Docker CLI
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -48,12 +43,12 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
 # ********************************************************
 # this obscure and error-prone command depends on lsb_release having been installed, which happens in the initial apt-get install above
-RUN wget -O - https://apt.releases.hashicorp.com/gpg | \
-    sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
-    | sudo tee /etc/apt/sources.list.d/hashicorp.list && \
-    apt-get update && \
-    apt-get install -y terraform
+# RUN wget -O - https://apt.releases.hashicorp.com/gpg | \
+#     sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
+#     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
+#     | sudo tee /etc/apt/sources.list.d/hashicorp.list && \
+#     apt-get update && \
+#     apt-get install -y terraform
 
 # ********************************************************
 # * Install go utils                                     *
@@ -65,9 +60,9 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install kubebuilder                                  *
 # ********************************************************
-RUN curl -L -o kubebuilder "https://go.kubebuilder.io/dl/latest/$(go env GOOS)/$(go env GOARCH)" && \
-    chmod +x kubebuilder && \
-    mv kubebuilder /usr/local/bin/
+# RUN curl -L -o kubebuilder "https://go.kubebuilder.io/dl/latest/$(go env GOOS)/$(go env GOARCH)" && \
+#     chmod +x kubebuilder && \
+#     mv kubebuilder /usr/local/bin/
 
 # ********************************************************
 # * Install eksctl and kubectl                           *
@@ -95,16 +90,16 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
 # * Install operator-sdk                                 *
 # * https://sdk.operatorframework.io/docs/installation/#install-from-github-release
 # ********************************************************
-RUN export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n arm64 ;; *) echo -n $(uname -m) ;; esac) && \
-    export OS=$(uname | awk '{print tolower($0)}') && \
-    export OPERATOR_SDK_VERSION=v1.41.1 && \
-    export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/$OPERATOR_SDK_VERSION && \
-    curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH} && \
-    curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt && \
-    curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt.asc && \
-    gpg --keyserver keyserver.ubuntu.com --recv-keys 052996E2A20B5C7E && \
-    chmod +x /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} && \
-    mv /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
+# RUN export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n arm64 ;; *) echo -n $(uname -m) ;; esac) && \
+#     export OS=$(uname | awk '{print tolower($0)}') && \
+#     export OPERATOR_SDK_VERSION=v1.41.1 && \
+#     export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/$OPERATOR_SDK_VERSION && \
+#     curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH} && \
+#     curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt && \
+#     curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt.asc && \
+#     gpg --keyserver keyserver.ubuntu.com --recv-keys 052996E2A20B5C7E && \
+#     chmod +x /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} && \
+#     mv /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
 
 # ********************************************************
 # * Install helm                                         *
@@ -124,14 +119,14 @@ RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.co
 # * Install krew                                          *
 # https://krew.sigs.k8s.io/docs/user-guide/setup/install/ *
 # *********************************************************
-RUN cd "$(mktemp -d)" && \
-    OS=$(uname | tr '[:upper:]' '[:lower:]') && \
-    ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/') && \
-    KREW="krew-${OS}_${ARCH}" && \
-    curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" && \
-    tar zxvf "${KREW}.tar.gz" && \
-    ./"${KREW}" install krew && \
-    echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> /home/$HOST_USERNAME/.bashrc
+# RUN cd "$(mktemp -d)" && \
+#     OS=$(uname | tr '[:upper:]' '[:lower:]') && \
+#     ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -e 's/aarch64$/arm64/') && \
+#     KREW="krew-${OS}_${ARCH}" && \
+#     curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/${KREW}.tar.gz" && \
+#     tar zxvf "${KREW}.tar.gz" && \
+#     ./"${KREW}" install krew && \
+#     echo 'export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"' >> /home/$HOST_USERNAME/.bashrc
 # could also pre-install selected plugins:
 # RUN kubectl krew install rabbitmq
 
