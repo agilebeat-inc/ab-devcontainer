@@ -56,6 +56,10 @@
         "--network=host",
         "--add-host", "gscloud.local:127.0.0.1"
     ],
+    "containerEnv": {
+        // the user's home directory on the host machine
+        "DOCKER_HOME_FOLDER_ON_HOST": "${localEnv:HOME}"
+    },
     "portsAttributes": {
         "3306": {
             "label": "mysql"
