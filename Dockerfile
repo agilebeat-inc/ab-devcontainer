@@ -136,7 +136,8 @@ ARG VENV_PATH=${HOST_HOME}/pythonenv
 COPY pip-requirements.txt .
 RUN python3 -m venv ${VENV_PATH} && \
     ${VENV_PATH}/bin/python -m pip install --upgrade pip && \
-    ${VENV_PATH}/bin/python -m pip install -r pip-requirements.txt
+    ${VENV_PATH}/bin/python -m pip install -r pip-requirements.txt && \
+    chown -R $HOST_USERNAME:$HOST_GROUPNAME $VENV_PATH
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
 USER $HOST_USERNAME

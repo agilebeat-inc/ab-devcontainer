@@ -36,18 +36,21 @@
     
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
     // "forwardPorts": [3001, 3306, 8983, 9001],
-        
     "mounts": [
         "source=${localEnv:HOME}/.aws/credentials,target=/home/vscode/.aws/credentials,type=bind",
         "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind",
         "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube,type=bind",
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
-        // optional: mount the directory where data dump is into the workspace container to be consistent with the Kind nodes
-        "source=${localEnv:HOME}/ab-workspace/r2p2/iaas-bioddex/playground/btc,target=/tmp/dump,type=bind"
+        "source=${localEnv:HOME}/.ab-kind,target=/home/vscode/.ab-kind,type=bind",
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
     ],
     "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=delegated ",
     "workspaceFolder": "${localWorkspaceFolder}",
     "remoteUser": "1000",
+    "initializeCommand": [
+        "bash",
+        "-lc",
+        "mkdir -p ~/.aws ~/.ssh ~/.kube ~/.ab-kind && touch ~/.aws/credentials ~/.kube/config"
+    ],
     "postStartCommand": "sudo chown $(id -u):$(id -u) /var/run/docker.sock",
     "runArgs": [
         "--network=host",
@@ -62,6 +65,10 @@
         },
         "8080": {
             "label": "geoserver"
+        },
+        "19530":{
+            "label": "milvus",
+            "onAutoForward": "notify"
         }
     }
 }
