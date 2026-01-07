@@ -65,10 +65,17 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 #     mv kubebuilder /usr/local/bin/
 
 # ********************************************************
+# * Install helm                                         *
+# ********************************************************
+RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
+    chmod 700 get_helm.sh && \
+    ./get_helm.sh
+
+# ********************************************************
 # * Install eksctl and kubectl                           *
 # ********************************************************
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
-    sudo mv /tmp/eksctl /usr/local/bin && \
+    mv /tmp/eksctl /usr/local/bin && \
     curl -Lo "/tmp/kubectl" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
     curl -Lo "/tmp/kubectl.sha256" "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
     echo "$(cat /tmp/kubectl.sha256)  /tmp/kubectl" | sha256sum --check && \
@@ -102,18 +109,18 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
 #     mv /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
 
 # ********************************************************
-# * Install helm                                         *
-# ********************************************************
-RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-    chmod 700 get_helm.sh && \
-    ./get_helm.sh
-
-# ********************************************************
 # * Install yq                                           *
 # ********************************************************
 RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
     chmod a+x /tmp/yq_linux_amd64/yq_linux_amd64 && \
     mv /tmp/yq_linux_amd64/yq_linux_amd64 /usr/local/bin/yq
+
+# ********************************************************
+# * Install mc - minio client                            *
+# ********************************************************
+RUN curl --create-dirs -O --output-dir /tmp/mc_client -LO https://dl.min.io/client/mc/release/linux-amd64/mc && \
+    chmod a+x /tmp/mc_client/mc && \
+    mv /tmp/mc_client/mc /usr/local/bin/mc
 
 # *********************************************************
 # * Install krew                                          *

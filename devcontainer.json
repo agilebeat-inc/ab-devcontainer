@@ -70,6 +70,9 @@
         "8080": {
             "label": "geoserver"
         },
+        "9000": {
+            "label": "MinIO"
+        },
         "19530":{
             "label": "milvus",
             "onAutoForward": "notify"

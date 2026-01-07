@@ -2,14 +2,14 @@
 awscli
 boto3
 ipykernel
-# geopandas
-# geopy
-# matplotlib
 mysql-connector-python
-# neo4j
+neo4j
 numpy
 pandas
 psycopg[binary]
-pymilvus
+pymilvus[bulk_writer,model]
+python-dotenv
 pyyaml
 SQLAlchemy
+tiktoken
+tqdm
