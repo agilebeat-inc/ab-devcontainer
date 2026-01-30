@@ -9,11 +9,13 @@ WORKDIR /tmp
 # - lsb-release so that terraform install command can identify the OS version
 # - networking utilties
 RUN apt-get update && \
-  apt-get install -y \ 
+  apt-get install -y \
   curl gcc g++ git jq lsb-release less locales-all sudo vim wget \
   postgresql-client python3-pip python3-venv \
   apt-transport-https ca-certificates gnupg gnupg-agent \
-  bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute
+  bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # installing Docker CLI
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -21,11 +23,13 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     chmod a+r /etc/apt/keyrings/docker.asc && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
     tee /etc/apt/sources.list.d/docker.list > /dev/null && \
-    apt-get update && apt-get install -y docker-ce-cli
+    apt-get update && apt-get install -y docker-ce-cli \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # install node (is this needed when we have containers?)
-RUN curl -fsSL https://deb.nodesource.com/setup_25.x | bash - && \
-    apt-get install -y nodejs
+COPY --from=node:25 /usr/local/bin/ /usr/local/bin/
+COPY --from=node:25 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
 
 ARG HOST_USERNAME=vscode
 ARG HOST_GROUPNAME=vscode
@@ -67,20 +71,18 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 && \
-    chmod 700 get_helm.sh && \
-    ./get_helm.sh
+COPY --from=alpine/helm:4.1.0 /usr/bin/helm /usr/local/bin/helm
 
 # ********************************************************
-# * Install eksctl and kubectl                           *
+# * Install kubectl                                      *
+# ********************************************************
+COPY --from=rancher/kubectl:v1.35.0 /bin/kubectl /usr/local/bin/kubectl
+
+# ********************************************************
+# * Install eksctl                                       *
 # ********************************************************
 RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
-    mv /tmp/eksctl /usr/local/bin && \
-    curl -Lo "/tmp/kubectl" "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
-    curl -Lo "/tmp/kubectl.sha256" "https://dl.k8s.io/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256" && \
-    echo "$(cat /tmp/kubectl.sha256)  /tmp/kubectl" | sha256sum --check && \
-    mv /tmp/kubectl /usr/local/bin && \
-    chmod 755 /usr/local/bin/kubectl
+    mv /tmp/eksctl /usr/local/bin
 
 # ********************************************************
 # * Install helmify                                      *
@@ -111,9 +113,7 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-RUN curl --create-dirs -O --output-dir /tmp/yq_linux_amd64 -LO https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
-    chmod a+x /tmp/yq_linux_amd64/yq_linux_amd64 && \
-    mv /tmp/yq_linux_amd64/yq_linux_amd64 /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.50.1 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
@@ -137,13 +137,16 @@ RUN curl --create-dirs -O --output-dir /tmp/mc_client -LO https://dl.min.io/clie
 # could also pre-install selected plugins:
 # RUN kubectl krew install rabbitmq
 
-# install python dependencies into a dedicated venv
-# the only downside here is that installing additional packages from inside container is tricky
+# install python dependencies into a dedicated venv using uv
+COPY --from=ghcr.io/astral-sh/uv:0.9.28 /uv /uvx /usr/local/bin/
+
 ARG VENV_PATH=${HOST_HOME}/pythonenv
+ENV VIRTUAL_ENV=${VENV_PATH}
+ENV PATH="${VENV_PATH}/bin:${PATH}"
+
 COPY pip-requirements.txt .
-RUN python3 -m venv ${VENV_PATH} && \
-    ${VENV_PATH}/bin/python -m pip install --upgrade pip && \
-    ${VENV_PATH}/bin/python -m pip install -r pip-requirements.txt && \
+RUN uv venv ${VENV_PATH} && \
+    uv pip install -r pip-requirements.txt && \
     chown -R $HOST_USERNAME:$HOST_GROUPNAME $VENV_PATH
 
 # [Optional] Set the default user. Omit if you want to keep the default as root.
