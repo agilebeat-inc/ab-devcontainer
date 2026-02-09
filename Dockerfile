@@ -59,7 +59,8 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
 # ********************************************************
 # https://go.dev/ref/mod#go-install
 RUN go install -v golang.org/x/tools/gopls@latest && \
-    go install -v sigs.k8s.io/kind@v0.31.0
+    go install -v sigs.k8s.io/kind@v0.31.0 && \
+    go install -v sigs.k8s.io/cloud-provider-kind@latest
 
 # ********************************************************
 # * Install kubebuilder                                  *

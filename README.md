@@ -1,8 +1,6 @@
 # ab-devcontainer project
 
-## Project
-
-### Add to new project
+## Add to new project
 
 ```sh
 git submodule add -b dev https://github.com/agilebeat-inc/ab-devcontainer.git .devcontainer
@@ -10,12 +8,12 @@ git submodule add -b dev https://github.com/agilebeat-inc/ab-devcontainer.git .d
 
 It is a template for devcontainer configuration
 
-### GitHub configuration
+## GitHub configuration
 
 BLUF: Devcontainer plugin for vsc will use credentails cached by github client on host server automatically. Just [download](https://github.com/cli/cli/releases/tag/v2.60.1) and install proper for your operating system version of github client. At the time of writing the version is v2.60.1.
 
 
-#### [Sharing Git credentials with your devcontainer.](https://code.visualstudio.com/remote/advancedcontainers/)
+### [Sharing Git credentials with your devcontainer.](https://code.visualstudio.com/remote/advancedcontainers/)
 
 The Dev Containers extension provides out of the box support for using local Git credentials from inside a container. In this section, we'll walk through the two supported options.
 
@@ -33,7 +31,7 @@ If you use HTTPS to clone your repositories and have a credential helper configu
 
 [see more ...](https://code.visualstudio.com/remote/advancedcontainers/)
 
-#### [Caching credentials on host so that devcontainer can use it.](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
+### [Caching credentials on host so that devcontainer can use it.](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
 
 GitHub CLI will automatically store your Git credentials for you when you choose HTTPS as your preferred protocol for Git operations and answer "yes" to the prompt asking if you would like to authenticate to Git with your GitHub credentials.
 
@@ -46,8 +44,7 @@ For more information about authenticating with GitHub CLI, see [gh auth login](h
 
 [see more ...](https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git)
 
-#### Change `zsh` to `bash` on mac
-
+## Change `zsh` to `bash` on mac
 
 Copilot
 Switching your Mac's default shell to Bash is quite straightforward. Here are the steps:
