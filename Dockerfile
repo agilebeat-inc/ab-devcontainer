@@ -1,17 +1,16 @@
-FROM golang:1.25-trixie
+FROM golang:1.26-trixie
 
 LABEL maintainer="Marek Dwulit<Marek.Dwulit@agilebeat.com>"
 
 WORKDIR /tmp 
 
-# adding 
+# adding
 # - locales-all since psql complains otherwise
 # - lsb-release so that terraform install command can identify the OS version
 # - networking utilties
 RUN apt-get update && \
   apt-get install -y \
-  curl gcc g++ git jq lsb-release less locales-all sudo vim wget \
-  postgresql-client python3-pip python3-venv \
+  curl gcc g++ git jq lsb-release less locales-all python3 sudo unzip vim wget \
   apt-transport-https ca-certificates gnupg gnupg-agent \
   bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
   && apt-get clean \
@@ -82,8 +81,12 @@ COPY --from=rancher/kubectl:v1.35.0 /bin/kubectl /usr/local/bin/kubectl
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp && \
-    mv /tmp/eksctl /usr/local/bin
+ARG EKSCTL_VERSION=0.222.0
+RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
+    curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
+    tar xz -C /tmp && \
+    chmod +x /tmp/eksctl && \
+    mv /tmp/eksctl /usr/local/bin/eksctl
 
 # ********************************************************
 # * Install helmify                                      *
@@ -114,7 +117,7 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.50.1 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.52.2 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
@@ -122,6 +125,14 @@ COPY --from=mikefarah/yq:4.50.1 /usr/bin/yq /usr/local/bin/yq
 RUN curl --create-dirs -O --output-dir /tmp/mc_client -LO https://dl.min.io/client/mc/release/linux-amd64/mc && \
     chmod a+x /tmp/mc_client/mc && \
     mv /tmp/mc_client/mc /usr/local/bin/mc
+
+# ********************************************************
+# * Install AWS CLI v2                                   *
+# ********************************************************
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    sudo ./aws/install && \
+    rm -rf /tmp/awscliv2.zip /tmp/aws
 
 # *********************************************************
 # * Install krew                                          *
@@ -138,17 +149,25 @@ RUN curl --create-dirs -O --output-dir /tmp/mc_client -LO https://dl.min.io/clie
 # could also pre-install selected plugins:
 # RUN kubectl krew install rabbitmq
 
-# install python dependencies into a dedicated venv using uv
+# ********************************************************
+# * Install Python utilities via uv                      *
+# ********************************************************
 COPY --from=ghcr.io/astral-sh/uv:0.9.28 /uv /uvx /usr/local/bin/
 
-ARG VENV_PATH=${HOST_HOME}/pythonenv
-ENV VIRTUAL_ENV=${VENV_PATH}
-ENV PATH="${VENV_PATH}/bin:${PATH}"
+# Set up the uv project in /opt/python-utils
+ARG PYTHON_UTILS_PATH=/opt/python-utils
+RUN mkdir -p ${PYTHON_UTILS_PATH}
+COPY pyproject.toml ${PYTHON_UTILS_PATH}/
 
-COPY pip-requirements.txt .
-RUN uv venv ${VENV_PATH} && \
-    uv pip install -r pip-requirements.txt && \
-    chown -R $HOST_USERNAME:$HOST_GROUPNAME $VENV_PATH
+# Install dependencies using uv sync
+WORKDIR ${PYTHON_UTILS_PATH}
+RUN uv sync && \
+    chown -R $HOST_USERNAME:$HOST_GROUPNAME ${PYTHON_UTILS_PATH}
 
-# [Optional] Set the default user. Omit if you want to keep the default as root.
+# Add the uv-managed venv to PATH
+ENV PATH="${PYTHON_UTILS_PATH}/.venv/bin:${PATH}"
+
+# Reset workdir
+WORKDIR /tmp
+
 USER $HOST_USERNAME

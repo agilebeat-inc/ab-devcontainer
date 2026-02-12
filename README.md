@@ -54,3 +54,13 @@ Switching your Mac's default shell to Bash is quite straightforward. Here are th
 3. Change to Bash: Type chsh -s /bin/bash and press Enter. You might be prompted to enter your password.
 4. Restart Terminal: Close and reopen Terminal to see the changes.
 
+
+## Python project
+
+The container python is pre-mapped to the project in `/opt/python-utils`; if we want to use `uv` commands which auto-reference this project, options are:
+
+```sh
+export UV_PROJECT=/opt/python-utils # to auto-reference
+uv tree --directory /opt/python-utils # run from this dir
+uv tree --project /opt/python-utils # just reference the project, keep running in pwd
+```
