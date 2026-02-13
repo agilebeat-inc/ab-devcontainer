@@ -59,7 +59,9 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
 # https://go.dev/ref/mod#go-install
 RUN go install -v golang.org/x/tools/gopls@latest && \
     go install -v sigs.k8s.io/kind@v0.31.0 && \
-    go install -v sigs.k8s.io/cloud-provider-kind@latest
+    go install -v sigs.k8s.io/cloud-provider-kind@latest && \
+    go clean -cache -modcache && \
+    rm -rf /root/.cache/go-build
 
 # ********************************************************
 # * Install kubebuilder                                  *
@@ -124,15 +126,17 @@ COPY --from=mikefarah/yq:4.52.2 /usr/bin/yq /usr/local/bin/yq
 # ********************************************************
 RUN curl --create-dirs -O --output-dir /tmp/mc_client -LO https://dl.min.io/client/mc/release/linux-amd64/mc && \
     chmod a+x /tmp/mc_client/mc && \
-    mv /tmp/mc_client/mc /usr/local/bin/mc
+    mv /tmp/mc_client/mc /usr/local/bin/mc && \
+    rm -rf /tmp/mc_client
 
 # ********************************************************
 # * Install AWS CLI v2                                   *
 # ********************************************************
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv2.zip" && \
+RUN export ARCH=$(uname -m) && \
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-${ARCH}.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
-    sudo ./aws/install && \
-    rm -rf /tmp/awscliv2.zip /tmp/aws
+    ./aws/install && \
+    rm -rf awscliv2.zip aws
 
 # *********************************************************
 # * Install krew                                          *
@@ -161,7 +165,9 @@ COPY pyproject.toml ${PYTHON_UTILS_PATH}/
 
 # Install dependencies using uv sync
 WORKDIR ${PYTHON_UTILS_PATH}
-RUN uv sync && \
+RUN uv sync --no-cache && \
+    rm -rf ${PYTHON_UTILS_PATH}/.uv/cache && \
+    find ${PYTHON_UTILS_PATH} -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
     chown -R $HOST_USERNAME:$HOST_GROUPNAME ${PYTHON_UTILS_PATH}
 
 # Add the uv-managed venv to PATH
