@@ -1,6 +1,6 @@
 FROM golang:1.26-trixie
 
-LABEL maintainer="Marek Dwulit<Marek.Dwulit@agilebeat.com>"
+LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
 WORKDIR /tmp 
 
@@ -71,17 +71,17 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.1.0 /usr/bin/helm /usr/local/bin/helm
+COPY --from=alpine/helm:4.1.1 /usr/bin/helm /usr/local/bin/helm
 
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=rancher/kubectl:v1.35.0 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=rancher/kubectl:v1.35.1 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.222.0
+ARG EKSCTL_VERSION=0.223.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -152,7 +152,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip" -o "awscliv
 # ********************************************************
 # * Install Python utilities via uv                      *
 # ********************************************************
-COPY --from=ghcr.io/astral-sh/uv:0.9.28 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.10.4 /uv /uvx /usr/local/bin/
 
 # Set up the uv project in /opt/python-utils
 ARG PYTHON_UTILS_PATH=/opt/python-utils
