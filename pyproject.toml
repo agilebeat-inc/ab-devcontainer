@@ -5,7 +5,9 @@ description = "Python environment for devcontainer"
 requires-python = ">=3.13"
 dependencies = [
     "boto3",
+    "fastapi",
     "ipykernel",
+    "jinja2",
     "mcp[cli]",
     "mysql-connector-python",
     "neo4j",
@@ -16,6 +18,7 @@ dependencies = [
     "pymilvus[bulk_writer,model]",
     "python-dotenv",
     "pyyaml",
+    "sqlparse",
     "SQLAlchemy",
     "tiktoken",
     "tqdm",

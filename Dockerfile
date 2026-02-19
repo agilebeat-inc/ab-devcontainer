@@ -170,8 +170,8 @@ RUN uv sync --no-cache && \
     find ${PYTHON_UTILS_PATH} -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
     chown -R $HOST_USERNAME:$HOST_GROUPNAME ${PYTHON_UTILS_PATH}
 
-# Add the uv-managed venv to PATH
-ENV PATH="${PYTHON_UTILS_PATH}/.venv/bin:${PATH}"
+# Add the uv-managed venv to PATH, as well as ~/.local/bin:
+ENV PATH="${PYTHON_UTILS_PATH}/.venv/bin:${HOST_HOME}/.local/bin:${PATH}"
 
 # Reset workdir
 WORKDIR /tmp
