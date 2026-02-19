@@ -62,5 +62,6 @@ The container python is pre-mapped to the project in `/opt/python-utils`; if we 
 ```sh
 export UV_PROJECT=/opt/python-utils # to auto-reference
 uv tree --directory /opt/python-utils # run from this dir
-uv tree --project /opt/python-utils # just reference the project, keep running in pwd
+# just reference the project, keep running in pwd; here, to install another package in the project
+uv add sqlparse --project /opt/python-utils 
 ```
