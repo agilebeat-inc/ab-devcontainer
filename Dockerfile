@@ -119,7 +119,7 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.52.2 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.52.4 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
@@ -156,7 +156,7 @@ RUN export ARCH=$(uname -m) && \
 # ********************************************************
 # * Install Python utilities via uv                      *
 # ********************************************************
-COPY --from=ghcr.io/astral-sh/uv:0.10.4 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.10.7 /uv /uvx /usr/local/bin/
 
 # Set up the uv project in /opt/python-utils
 ARG PYTHON_UTILS_PATH=/opt/python-utils
@@ -181,4 +181,3 @@ ENV PATH="${PYTHON_UTILS_PATH}/.venv/bin:${PATH}"
 
 # Reset workdir
 WORKDIR /tmp
-
