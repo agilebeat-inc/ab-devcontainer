@@ -40,7 +40,8 @@ ARG HOST_HOME=/home/vscode
 RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && useradd --uid $HOST_UID --gid $HOST_GID -m $HOST_USERNAME -d $HOST_HOME \
     && echo $HOST_USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$HOST_USERNAME \
-    && chmod 0440 /etc/sudoers.d/$HOST_USERNAME
+    && chmod 0440 /etc/sudoers.d/$HOST_USERNAME \
+    && groupadd -f docker && usermod -aG docker $HOST_USERNAME
 
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
