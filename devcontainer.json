@@ -1,6 +1,9 @@
 {
     "name": "${localWorkspaceFolderBasename}",
-    "dockerFile": "Dockerfile",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "updateRemoteUserUID": true,
 
     "customizations": {
         "vscode": {
@@ -41,16 +44,16 @@
         "source=${localEnv:HOME}/.aws/credentials,target=/home/vscode/.aws/credentials,type=bind",
         "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube,type=bind",
         "source=${localEnv:HOME}/.ab-kind,target=/home/vscode/.ab-kind,type=bind",
-        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind",
+        "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly"
     ],
     "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind,consistency=delegated ",
     "workspaceFolder": "${localWorkspaceFolder}",
     "remoteUser": "vscode",
-    "updateRemoteUserUID": true,
     "initializeCommand": [
         "bash",
         "-lc",
-        "mkdir -p ~/.aws ~/.kube ~/.ab-kind && touch ~/.aws/credentials ~/.kube/config"
+        "mkdir -p ~/.aws ~/.kube ~/.ab-kind ~/.ssh && touch ~/.aws/credentials ~/.kube/config"
     ],
     "postStartCommand": "sudo chown root:docker /var/run/docker.sock && sudo chmod 660 /var/run/docker.sock",
     "runArgs": [
