@@ -111,7 +111,7 @@ RUN curl --silent --location "https://github.com/weaveworks/eksctl/releases/late
     echo "$(cat /tmp/kubectl.sha256)  /tmp/kubectl" | sha256sum --check && mv /tmp/kubectl /usr/local/bin && chmod 755 /usr/local/bin/kubectl
 
 # ********************************************************
-# * Install operator-sdk                                 *
+# * Install helmify                                      *
 # ********************************************************
 RUN curl --create-dirs -O --output-dir /tmp/helmify -LO https://github.com/arttor/helmify/releases/download/v0.4.11/helmify_Linux_x86_64.tar.gz && \
     curl --create-dirs -O --output-dir /tmp/helmify -LO https://github.com/arttor/helmify/releases/download/v0.4.11/checksums.txt && \
@@ -121,18 +121,23 @@ RUN curl --create-dirs -O --output-dir /tmp/helmify -LO https://github.com/artto
     mv /tmp/helmify/helmify /usr/local/bin/helmify
 
 # ********************************************************
-# * Install helmify                                      *
+# * Install operator-sdk                                 *
 # ********************************************************
-RUN export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n arm64 ;; *) echo -n $(uname -m) ;; esac) && \
-    export OS=$(uname | awk '{print tolower($0)}')&& \
-    export OPERATOR_SDK_VERSION=v0.4.11 && \
-    export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/$OPERATOR_SDK_VERSION && \
-    curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH} && \
-    curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt && \
-    curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt.asc && \
-    gpg --keyserver keyserver.ubuntu.com --recv-keys 052996E2A20B5C7E && \
-    chmod +x /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} && \
-    mv /tmp/operator-sdk/operator-sdk_${OS}_${ARCH} /usr/local/bin/operator-sdk
+RUN set -eux; \
+    ARCH="$(uname -m)"; \
+    case "$ARCH" in \
+        x86_64) ARCH="amd64" ;; \
+        aarch64|arm64) ARCH="arm64" ;; \
+    esac; \
+    OS="$(uname | tr '[:upper:]' '[:lower:]')"; \
+    OPERATOR_SDK_VERSION="v1.42.0"; \
+    OPERATOR_SDK_DL_URL="https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}"; \
+    curl --create-dirs --output-dir /tmp/operator-sdk -LO "${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH}"; \
+    curl --create-dirs --output-dir /tmp/operator-sdk -LO "${OPERATOR_SDK_DL_URL}/checksums.txt"; \
+    grep "operator-sdk_${OS}_${ARCH}$" /tmp/operator-sdk/checksums.txt | (cd /tmp/operator-sdk && sha256sum -c -); \
+    chmod +x "/tmp/operator-sdk/operator-sdk_${OS}_${ARCH}"; \
+    mv "/tmp/operator-sdk/operator-sdk_${OS}_${ARCH}" /usr/local/bin/operator-sdk; \
+    /usr/local/bin/operator-sdk version
 
 # ********************************************************
 # * Add network troubleshooting on the container         *
