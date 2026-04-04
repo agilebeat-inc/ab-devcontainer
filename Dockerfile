@@ -74,7 +74,7 @@ RUN apt-get install wget curl unzip software-properties-common gnupg2 -y
 RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | apt-key add -
 RUN apt-add-repository "deb [arch=$(dpkg --print-architecture)] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 RUN apt-get update -y
-RUN apt-get install terraform -y
+RUN apt-get install terraform packer -y
 
 # ********************************************************
 # * Install go                                           *
