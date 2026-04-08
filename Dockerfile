@@ -74,17 +74,17 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.1.1 /usr/bin/helm /usr/local/bin/helm
+COPY --from=alpine/helm:4.1.3 /usr/bin/helm /usr/local/bin/helm
 
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=rancher/kubectl:v1.35.1 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=rancher/kubectl:v1.35.2 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.223.0
+ARG EKSCTL_VERSION=0.225.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -120,7 +120,7 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.52.4 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.52.5 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
@@ -154,31 +154,16 @@ RUN export ARCH=$(uname -m) && \
 # could also pre-install selected plugins:
 # RUN kubectl krew install rabbitmq
 
-# ********************************************************
-# * Install Python utilities via uv                      *
-# ********************************************************
-COPY --from=ghcr.io/astral-sh/uv:0.10.7 /uv /uvx /usr/local/bin/
-
-# Set up the uv project in /opt/python-utils
-ARG PYTHON_UTILS_PATH=/opt/python-utils
-RUN mkdir -p ${PYTHON_UTILS_PATH}
-COPY pyproject.toml ${PYTHON_UTILS_PATH}/
-
-# Install dependencies using uv sync
-WORKDIR ${PYTHON_UTILS_PATH}
-RUN uv sync --no-cache && \
-    rm -rf ${PYTHON_UTILS_PATH}/.uv/cache && \
-    find ${PYTHON_UTILS_PATH} -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true && \
-    chown -R $HOST_USERNAME:$HOST_GROUPNAME ${PYTHON_UTILS_PATH}
+# ***********************************
+# * Install uv                      *
+# ***********************************
+COPY --from=ghcr.io/astral-sh/uv:0.11.3 /uv /uvx /usr/local/bin/
 
 # install claude cli
 # doing this as container user since the binary is actually a symlink
 # so copying from /root elsewhere still inherits permission issues
 USER $HOST_USERNAME
 RUN curl -fsSL https://claude.ai/install.sh | bash
-
-# Add the uv-managed venv to PATH
-ENV PATH="${PYTHON_UTILS_PATH}/.venv/bin:${PATH}"
 
 # Reset workdir
 WORKDIR /tmp
