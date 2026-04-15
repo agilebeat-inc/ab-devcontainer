@@ -1,4 +1,4 @@
-FROM golang:1.26-trixie
+FROM golang:1.26.2-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -74,12 +74,12 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.1.3 /usr/bin/helm /usr/local/bin/helm
+COPY --from=alpine/helm:4.1.4 /usr/bin/helm /usr/local/bin/helm        
 
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=rancher/kubectl:v1.35.2 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=registry.k8s.io/kubectl:v1.35.3 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
@@ -157,7 +157,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv                      *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.3 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /usr/local/bin/
 
 # install claude cli
 # doing this as container user since the binary is actually a symlink
