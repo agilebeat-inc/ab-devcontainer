@@ -10,7 +10,7 @@ WORKDIR /tmp
 # - networking utilties
 RUN apt-get update && \
   apt-get install -y \
-  curl gcc g++ git jq lsb-release less locales-all python3 sudo unzip vim wget \
+  curl gcc g++ git jq lsb-release less locales-all sudo unzip vim wget \
   apt-transport-https ca-certificates gnupg gnupg-agent \
   bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
   && apt-get clean \
@@ -155,9 +155,12 @@ RUN export ARCH=$(uname -m) && \
 # RUN kubectl krew install rabbitmq
 
 # ***********************************
-# * Install uv                      *
+# * Install uv + python             *
 # ***********************************
 COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /usr/local/bin/
+ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
+RUN uv python install 3.14 && \
+    ln -s "$(uv python find 3.14)" /usr/local/bin/python3
 
 # install claude cli
 # doing this as container user since the binary is actually a symlink
