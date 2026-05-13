@@ -1,4 +1,4 @@
-FROM golang:1.26.2-trixie
+FROM golang:1.26.3-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -79,12 +79,12 @@ COPY --from=alpine/helm:4.1.4 /usr/bin/helm /usr/local/bin/helm
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=registry.k8s.io/kubectl:v1.35.3 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=registry.k8s.io/kubectl:v1.36.1 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.225.0
+ARG EKSCTL_VERSION=0.226.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -120,7 +120,7 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.52.5 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.53.2 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
@@ -157,7 +157,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.6 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.14 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3
