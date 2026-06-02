@@ -5,16 +5,17 @@ LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marches
 WORKDIR /tmp 
 
 # adding
-# - locales-all since psql complains otherwise
-# - lsb-release so that terraform install command can identify the OS version
+# - locales fiddling since psql complains otherwise (and it's good to have a locale properly set)
 # - networking utilties
 RUN apt-get update && \
   apt-get install -y \
-  curl gcc g++ git jq lsb-release less locales-all sudo unzip vim wget \
-  apt-transport-https ca-certificates gnupg gnupg-agent \
+  ca-certificates curl git jq less locales sudo unzip vim wget \
   bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
+  && locale-gen en_US.UTF-8 \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
+
+ENV LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
 
 # installing Docker CLI
 RUN install -m 0755 -d /etc/apt/keyrings && \
@@ -25,10 +26,6 @@ RUN install -m 0755 -d /etc/apt/keyrings && \
     apt-get update && apt-get install -y docker-ce-cli \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# install node (is this needed when we have containers?)
-COPY --from=node:25 /usr/local/bin/ /usr/local/bin/
-COPY --from=node:25 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
 
 ARG HOST_USERNAME=vscode
 ARG HOST_GROUPNAME=vscode
@@ -43,9 +40,14 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && chmod 0440 /etc/sudoers.d/$HOST_USERNAME \
     && groupadd -f docker && usermod -aG docker $HOST_USERNAME
 
+# install node (is this needed when we have containers?)
+COPY --from=node:25 /usr/local/bin/ /usr/local/bin/
+COPY --from=node:25 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
 # ********************************************************
+COPY --from=hashicorp/terraform:1.15 /bin/terraform /usr/local/bin/terraform
 # this obscure and error-prone command depends on lsb_release having been installed, which happens in the initial apt-get install above
 # RUN wget -O - https://apt.releases.hashicorp.com/gpg | \
 #     sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
@@ -74,7 +76,7 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.1.4 /usr/bin/helm /usr/local/bin/helm        
+COPY --from=alpine/helm:4.2.0 /usr/bin/helm /usr/local/bin/helm        
 
 # ********************************************************
 # * Install kubectl                                      *
@@ -84,7 +86,7 @@ COPY --from=registry.k8s.io/kubectl:v1.36.1 /bin/kubectl /usr/local/bin/kubectl
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.226.0
+ARG EKSCTL_VERSION=0.227.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -125,10 +127,7 @@ COPY --from=mikefarah/yq:4.53.2 /usr/bin/yq /usr/local/bin/yq
 # ********************************************************
 # * Install mc - minio client                            *
 # ********************************************************
-RUN curl --create-dirs -O --output-dir /tmp/mc_client -LO https://dl.min.io/client/mc/release/linux-amd64/mc && \
-    chmod a+x /tmp/mc_client/mc && \
-    mv /tmp/mc_client/mc /usr/local/bin/mc && \
-    rm -rf /tmp/mc_client
+COPY --from=minio/mc:RELEASE.2025-08-13T08-35-41Z /usr/bin/mc /usr/local/bin/mc
 
 # ********************************************************
 # * Install AWS CLI v2                                   *
@@ -157,7 +156,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.14 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.18 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3
