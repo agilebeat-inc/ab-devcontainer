@@ -11,7 +11,8 @@ RUN apt-get update && \
   apt-get install -y \
   ca-certificates curl git jq less locales sudo unzip vim wget \
   bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
-  && locale-gen en_US.UTF-8 \
+  && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+  && locale-gen \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
