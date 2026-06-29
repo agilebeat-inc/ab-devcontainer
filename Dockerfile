@@ -1,4 +1,4 @@
-FROM golang:1.26.3-trixie
+FROM golang:1.26.4-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -62,7 +62,7 @@ COPY --from=hashicorp/terraform:1.15 /bin/terraform /usr/local/bin/terraform
 # ********************************************************
 # https://go.dev/ref/mod#go-install
 RUN go install -v golang.org/x/tools/gopls@latest && \
-    go install -v sigs.k8s.io/kind@v0.31.0 && \
+    go install -v sigs.k8s.io/kind@v0.32.0 && \
     go install -v sigs.k8s.io/cloud-provider-kind@latest && \
     go clean -cache -modcache && \
     rm -rf /root/.cache/go-build
@@ -77,17 +77,17 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.2.0 /usr/bin/helm /usr/local/bin/helm        
+COPY --from=alpine/helm:4.2.2 /usr/bin/helm /usr/local/bin/helm        
 
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=registry.k8s.io/kubectl:v1.36.1 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=registry.k8s.io/kubectl:v1.36.2 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.227.0
+ARG EKSCTL_VERSION=0.228.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -123,11 +123,12 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.53.2 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.53.3 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
 # ********************************************************
+# TODO: get rid of minio/mc in favor of s3 and awscli
 COPY --from=minio/mc:RELEASE.2025-08-13T08-35-41Z /usr/bin/mc /usr/local/bin/mc
 
 # ********************************************************
@@ -157,7 +158,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.18 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.25 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3

@@ -24,7 +24,6 @@
                 "anthropic.claude-code",
                 "dbaeumer.vscode-eslint",
                 "golang.go",
-                "humao.rest-client",
                 "ms-ossdata.vscode-pgsql",
                 "ms-python.black-formatter",
                 "ms-python.python",
@@ -32,8 +31,7 @@
                 "ms-toolsai.jupyter",
                 "ms-vscode-remote.remote-containers",
                 "ms-vscode-remote.vscode-remote-extensionpack",
-                "ms-kubernetes-tools.vscode-kubernetes-tools",
-                "Continue.continue"
+                "ms-kubernetes-tools.vscode-kubernetes-tools"
             ]
         }
     },
