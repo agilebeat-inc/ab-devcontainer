@@ -1,4 +1,4 @@
-FROM golang:1.26.4-trixie
+FROM golang:1.26.5-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -42,8 +42,8 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && groupadd -f docker && usermod -aG docker $HOST_USERNAME
 
 # install node (is this needed when we have containers?)
-COPY --from=node:25 /usr/local/bin/ /usr/local/bin/
-COPY --from=node:25 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+COPY --from=node:26 /usr/local/bin/ /usr/local/bin/
+COPY --from=node:26 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
 
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
@@ -87,7 +87,7 @@ COPY --from=registry.k8s.io/kubectl:v1.36.2 /bin/kubectl /usr/local/bin/kubectl
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.228.0
+ARG EKSCTL_VERSION=0.229.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -158,7 +158,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.25 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.28 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3
