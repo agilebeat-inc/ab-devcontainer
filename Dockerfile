@@ -34,7 +34,7 @@ ARG HOST_UID=1000
 ARG HOST_GID=$HOST_UID
 ARG HOST_HOME=/home/vscode
 
-# Create the user
+# Create the user; add them to sudoers and docker users groups
 RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && useradd --uid $HOST_UID --gid $HOST_GID -m $HOST_USERNAME -d $HOST_HOME \
     && echo $HOST_USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$HOST_USERNAME \
@@ -49,13 +49,6 @@ COPY --from=node:26 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
 # ********************************************************
 COPY --from=hashicorp/terraform:1.15 /bin/terraform /usr/local/bin/terraform
-# this obscure and error-prone command depends on lsb_release having been installed, which happens in the initial apt-get install above
-# RUN wget -O - https://apt.releases.hashicorp.com/gpg | \
-#     sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
-#     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" \
-#     | sudo tee /etc/apt/sources.list.d/hashicorp.list && \
-#     apt-get update && \
-#     apt-get install -y terraform
 
 # ********************************************************
 # * Install go utils                                     *
@@ -77,7 +70,7 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.2.2 /usr/bin/helm /usr/local/bin/helm        
+COPY --from=alpine/helm:4.2.3 /usr/bin/helm /usr/local/bin/helm        
 
 # ********************************************************
 # * Install kubectl                                      *
@@ -158,7 +151,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.28 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.29 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3
