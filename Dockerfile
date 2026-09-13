@@ -1,4 +1,4 @@
-FROM golang:1.26.5-trixie
+FROM golang:1.27.1-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -70,17 +70,17 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.2.3 /usr/bin/helm /usr/local/bin/helm        
+COPY --from=alpine/helm:4.3.0 /usr/bin/helm /usr/local/bin/helm        
 
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=registry.k8s.io/kubectl:v1.36.2 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=registry.k8s.io/kubectl:v1.37.0 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.229.0
+ARG EKSCTL_VERSION=0.230.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -116,13 +116,13 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.53.3 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.53.6 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
 # ********************************************************
 # TODO: get rid of minio/mc in favor of s3 and awscli
-COPY --from=minio/mc:RELEASE.2025-08-13T08-35-41Z /usr/bin/mc /usr/local/bin/mc
+# COPY --from=minio/mc:RELEASE.2025-08-13T08-35-41Z /usr/bin/mc /usr/local/bin/mc
 
 # ********************************************************
 # * Install AWS CLI v2                                   *
@@ -151,7 +151,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.11.29 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.13 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3
