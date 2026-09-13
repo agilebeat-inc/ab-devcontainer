@@ -55,7 +55,7 @@ COPY --from=hashicorp/terraform:1.15 /bin/terraform /usr/local/bin/terraform
 # ********************************************************
 # https://go.dev/ref/mod#go-install
 RUN go install -v golang.org/x/tools/gopls@latest && \
-    go install -v sigs.k8s.io/kind@v0.32.0 && \
+    go install -v sigs.k8s.io/kind@v0.33.0 && \
     go install -v sigs.k8s.io/cloud-provider-kind@latest && \
     go clean -cache -modcache && \
     rm -rf /root/.cache/go-build
