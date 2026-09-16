@@ -21,17 +21,15 @@
 
             // Add the IDs of extensions you want installed when the container is created in the array below.
             "extensions": [
-                "anthropic.claude-code",
-                "dbaeumer.vscode-eslint",
                 "golang.go",
-                "ms-ossdata.vscode-pgsql",
                 "ms-python.black-formatter",
                 "ms-python.python",
                 "ms-python.vscode-pylance",
                 "ms-toolsai.jupyter",
                 "ms-vscode-remote.remote-containers",
                 "ms-vscode-remote.vscode-remote-extensionpack",
-                "ms-kubernetes-tools.vscode-kubernetes-tools"
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                "openai.chatgpt"
             ]
         }
     },

@@ -1,4 +1,4 @@
-FROM golang:1.26.5-trixie
+FROM golang:1.26.6-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -34,12 +34,16 @@ ARG HOST_UID=1000
 ARG HOST_GID=$HOST_UID
 ARG HOST_HOME=/home/vscode
 
+ENV PATH="$HOST_HOME/.local/bin:$HOST_HOME/go/bin:/usr/local/go/bin:$PATH"
+
 # Create the user; add them to sudoers and docker users groups
 RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && useradd --uid $HOST_UID --gid $HOST_GID -m $HOST_USERNAME -d $HOST_HOME \
     && echo $HOST_USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$HOST_USERNAME \
     && chmod 0440 /etc/sudoers.d/$HOST_USERNAME \
-    && groupadd -f docker && usermod -aG docker $HOST_USERNAME
+    && groupadd -f docker && usermod -aG docker $HOST_USERNAME \
+    && printf '%s\n' 'export PATH="$HOME/.local/bin:$HOME/go/bin:/usr/local/go/bin:$PATH"' \
+      > /etc/profile.d/devcontainer-path.sh
 
 # install node (is this needed when we have containers?)
 COPY --from=node:26 /usr/local/bin/ /usr/local/bin/
@@ -54,11 +58,14 @@ COPY --from=hashicorp/terraform:1.15 /bin/terraform /usr/local/bin/terraform
 # * Install go utils                                     *
 # ********************************************************
 # https://go.dev/ref/mod#go-install
-RUN go install -v golang.org/x/tools/gopls@latest && \
+RUN export GOBIN=/usr/local/bin && \
+    go install -v golang.org/x/tools/gopls@latest && \
     go install -v sigs.k8s.io/kind@v0.32.0 && \
     go install -v sigs.k8s.io/cloud-provider-kind@latest && \
     go clean -cache -modcache && \
     rm -rf /root/.cache/go-build
+
+ENV GOPATH="$HOST_HOME/go"
 
 # ********************************************************
 # * Install kubebuilder                                  *
@@ -122,7 +129,7 @@ COPY --from=mikefarah/yq:4.53.3 /usr/bin/yq /usr/local/bin/yq
 # * Install mc - minio client                            *
 # ********************************************************
 # TODO: get rid of minio/mc in favor of s3 and awscli
-COPY --from=minio/mc:RELEASE.2025-08-13T08-35-41Z /usr/bin/mc /usr/local/bin/mc
+COPY --from=quay.io/minio/mc:RELEASE.2025-08-13T08-35-41Z /usr/bin/mc /usr/local/bin/mc
 
 # ********************************************************
 # * Install AWS CLI v2                                   *
@@ -160,7 +167,6 @@ RUN uv python install 3.14 && \
 # doing this as container user since the binary is actually a symlink
 # so copying from /root elsewhere still inherits permission issues
 USER $HOST_USERNAME
-RUN curl -fsSL https://claude.ai/install.sh | bash
 
 # Reset workdir
 WORKDIR /tmp
