@@ -55,8 +55,8 @@
     ],
     "postStartCommand": [
         "/bin/sh",
-        "-c",
-        "'${containerWorkspaceFolder}/.devcontainer/post-start.sh' '${containerWorkspaceFolder}'"
+        "${containerWorkspaceFolder}/.devcontainer/post-start.sh",
+        "${containerWorkspaceFolder}"
     ],
     "runArgs": [
         "--network=host",
