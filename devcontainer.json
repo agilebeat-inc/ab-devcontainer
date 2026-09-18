@@ -21,7 +21,6 @@
 
             // Add the IDs of extensions you want installed when the container is created in the array below.
             "extensions": [
-                "anthropic.claude-code",
                 "dbaeumer.vscode-eslint",
                 "golang.go",
                 "ms-ossdata.vscode-pgsql",
@@ -31,7 +30,8 @@
                 "ms-toolsai.jupyter",
                 "ms-vscode-remote.remote-containers",
                 "ms-vscode-remote.vscode-remote-extensionpack",
-                "ms-kubernetes-tools.vscode-kubernetes-tools"
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                "openai.chatgpt"
             ]
         }
     },
@@ -53,7 +53,11 @@
         "-lc",
         "mkdir -p ~/.aws ~/.kube ~/.ab-kind ~/.ssh && touch ~/.aws/credentials ~/.kube/config"
     ],
-    "postStartCommand": "sudo chown root:docker /var/run/docker.sock && sudo chmod 660 /var/run/docker.sock",
+    "postStartCommand": [
+        "/bin/sh",
+        "-c",
+        "'${containerWorkspaceFolder}/.devcontainer/post-start.sh' '${containerWorkspaceFolder}'"
+    ],
     "runArgs": [
         "--network=host",
         "--add-host", "gscloud.local:127.0.0.1"

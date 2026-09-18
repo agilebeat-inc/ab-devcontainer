@@ -1,0 +1,11 @@
+# Shared Codex configuration for projects using this devcontainer.
+#
+# Keep this file limited to project/tooling configuration that should be shared
+# across all users and repositories. Examples include shared MCP servers and
+# project-scoped tool permissions. Do not add personal preferences here, such
+# as model selection, reasoning effort, UI settings, authentication, history,
+# or telemetry settings.
+#
+# Put coding guidance in AGENTS.md at the relevant repository scope.
+#
+# This file intentionally has no active settings yet.

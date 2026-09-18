@@ -159,8 +159,8 @@ RUN uv python install 3.14 && \
 # install claude cli
 # doing this as container user since the binary is actually a symlink
 # so copying from /root elsewhere still inherits permission issues
+# RUN curl -fsSL https://claude.ai/install.sh | bash
 USER $HOST_USERNAME
-RUN curl -fsSL https://claude.ai/install.sh | bash
 
 # Reset workdir
 WORKDIR /tmp
