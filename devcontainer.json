@@ -51,7 +51,7 @@
     "initializeCommand": [
         "bash",
         "-lc",
-        "mkdir -p ~/.aws ~/.kube ~/.ab-kind ~/.ssh && touch ~/.aws/credentials ~/.kube/config"
+        "mkdir -p ~/.aws ~/.kube ~/.ab-kind ~/.ssh && touch ~/.aws/credentials"
     ],
     "postStartCommand": [
         "/bin/sh",

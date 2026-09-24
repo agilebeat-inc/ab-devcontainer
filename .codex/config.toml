@@ -8,4 +8,7 @@
 #
 # Put coding guidance in AGENTS.md at the relevant repository scope.
 #
-# This file intentionally has no active settings yet.
+# SQLChat MCP is normally exposed from the cluster with:
+# kubectl port-forward services/btc-mcp-server 8000:8000 -n sqlchat
+[mcp_servers.sqlchat]
+url = "http://localhost:8000/sqlmcp/"

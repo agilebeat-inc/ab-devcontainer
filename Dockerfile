@@ -35,11 +35,14 @@ ARG HOST_GID=$HOST_UID
 ARG HOST_HOME=/home/vscode
 
 # Create the user; add them to sudoers and docker users groups
+# The credentials file is bind-mounted into this directory. Creating the target
+# in the image prevents Docker from creating it as root at runtime.
 RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && useradd --uid $HOST_UID --gid $HOST_GID -m $HOST_USERNAME -d $HOST_HOME \
     && echo $HOST_USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$HOST_USERNAME \
     && chmod 0440 /etc/sudoers.d/$HOST_USERNAME \
-    && groupadd -f docker && usermod -aG docker $HOST_USERNAME
+    && groupadd -f docker && usermod -aG docker $HOST_USERNAME \
+    && install -d -o $HOST_USERNAME -g $HOST_GROUPNAME -m 0700 $HOST_HOME/.aws
 
 # install node (is this needed when we have containers?)
 COPY --from=node:26 /usr/local/bin/ /usr/local/bin/
