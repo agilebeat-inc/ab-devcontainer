@@ -51,7 +51,7 @@ COPY --from=node:26 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
 # ********************************************************
-COPY --from=hashicorp/terraform:1.15 /bin/terraform /usr/local/bin/terraform
+COPY --from=hashicorp/terraform:1.16 /bin/terraform /usr/local/bin/terraform
 
 # ********************************************************
 # * Install go utils                                     *
@@ -78,7 +78,7 @@ COPY --from=alpine/helm:4.3.0 /usr/bin/helm /usr/local/bin/helm
 # ********************************************************
 # * Install kubectl                                      *
 # ********************************************************
-COPY --from=registry.k8s.io/kubectl:v1.37.0 /bin/kubectl /usr/local/bin/kubectl
+COPY --from=registry.k8s.io/kubectl:v1.37.1 /bin/kubectl /usr/local/bin/kubectl
 
 # ********************************************************
 # * Install eksctl                                       *
@@ -119,7 +119,7 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install yq                                           *
 # ********************************************************
-COPY --from=mikefarah/yq:4.53.6 /usr/bin/yq /usr/local/bin/yq
+COPY --from=mikefarah/yq:4.54.1 /usr/bin/yq /usr/local/bin/yq
 
 # ********************************************************
 # * Install mc - minio client                            *
@@ -154,7 +154,7 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.12.13 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3
