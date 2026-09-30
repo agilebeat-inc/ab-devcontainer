@@ -8,6 +8,7 @@
     "customizations": {
         "vscode": {
             "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python3",
                 "terminal.integrated.profile.linux": {
                     "bash": {
                         "path": "/bin/bash"
