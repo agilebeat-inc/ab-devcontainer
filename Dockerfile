@@ -1,4 +1,4 @@
-FROM golang:1.27.1-trixie
+FROM golang:1.27.2-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -83,7 +83,7 @@ COPY --from=registry.k8s.io/kubectl:v1.37.1 /bin/kubectl /usr/local/bin/kubectl
 # ********************************************************
 # * Install eksctl                                       *
 # ********************************************************
-ARG EKSCTL_VERSION=0.230.0
+ARG EKSCTL_VERSION=0.231.0
 RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && \
     curl -sL "https://github.com/eksctl-io/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname -s)_${ARCH}.tar.gz" | \
     tar xz -C /tmp && \
@@ -154,10 +154,12 @@ RUN export ARCH=$(uname -m) && \
 # ***********************************
 # * Install uv + python             *
 # ***********************************
-COPY --from=ghcr.io/astral-sh/uv:0.12.21 /uv /uvx /usr/local/bin/
+# note: default python in uv 0.13+ is 3.15
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.14 && \
-    ln -s "$(uv python find 3.14)" /usr/local/bin/python3
+    ln -s "$(uv python find 3.14)" /usr/local/bin/python3 && \
+    ln -s "$(uv python find 3.14)" /usr/local/bin/python
 
 # install claude cli
 # doing this as container user since the binary is actually a symlink
