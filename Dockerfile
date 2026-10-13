@@ -45,8 +45,8 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
     && install -d -o $HOST_USERNAME -g $HOST_GROUPNAME -m 0700 $HOST_HOME/.aws
 
 # install node (is this needed when we have containers?)
-COPY --from=node:26 /usr/local/bin/ /usr/local/bin/
-COPY --from=node:26 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
+# COPY --from=node:26 /usr/local/bin/ /usr/local/bin/
+# COPY --from=node:26 /usr/local/lib/node_modules/ /usr/local/lib/node_modules/
 
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
@@ -93,7 +93,7 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # * Install helmify                                      *
 # ********************************************************
-# ARG helmify_version=v0.4.18
+# ARG helmify_version=v0.xx.yyy
 # RUN curl --create-dirs -O --output-dir /tmp/helmify -LO "https://github.com/arttor/helmify/releases/download/${helmify_version}/helmify_Linux_x86_64.tar.gz" && \
 #     curl --create-dirs -O --output-dir /tmp/helmify -LO "https://github.com/arttor/helmify/releases/download/${helmify_version}/checksums.txt" && \
 #     cd /tmp/helmify && \
@@ -107,7 +107,7 @@ RUN export ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/') && 
 # ********************************************************
 # RUN export ARCH=$(case $(uname -m) in x86_64) echo -n amd64 ;; aarch64) echo -n arm64 ;; *) echo -n $(uname -m) ;; esac) && \
 #     export OS=$(uname | awk '{print tolower($0)}') && \
-#     export OPERATOR_SDK_VERSION=v1.41.1 && \
+#     export OPERATOR_SDK_VERSION=v1.xx.yyy && \
 #     export OPERATOR_SDK_DL_URL=https://github.com/operator-framework/operator-sdk/releases/download/$OPERATOR_SDK_VERSION && \
 #     curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/operator-sdk_${OS}_${ARCH} && \
 #     curl --create-dirs -O --output-dir /tmp/operator-sdk -LO ${OPERATOR_SDK_DL_URL}/checksums.txt && \
@@ -161,11 +161,15 @@ RUN uv python install 3.14 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python3 && \
     ln -s "$(uv python find 3.14)" /usr/local/bin/python
 
-# install claude cli
-# doing this as container user since the binary is actually a symlink
-# so copying from /root elsewhere still inherits permission issues
-# RUN curl -fsSL https://claude.ai/install.sh | bash
+ENV PATH="${HOST_HOME}/.local/bin:${PATH}"
 USER $HOST_USERNAME
+# ********************************************************
+# * Install Codex CLI                                    *
+# * https://learn.chatgpt.com/docs/codex/cli.            *
+# ********************************************************
+# identical to claude code, we must switch user here first - otherwise it installs under
+# root and is invisible to the container user!
+RUN curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
 
 # Reset workdir
 WORKDIR /tmp

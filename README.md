@@ -65,3 +65,15 @@ uv tree --directory /opt/python-utils # run from this dir
 # just reference the project, keep running in pwd; here, to install another package in the project
 uv add sqlparse --project /opt/python-utils 
 ```
+
+## Codex
+
+Both the CLI and vscode extension are used; if they share the same credential store, signing in on one should sign in on both; check
+
+```sh
+codex login status
+```
+
+to confirm.
+
+To configure and use MCP servers among other things, the actual Codex CLI (not just VSCode extension) must be installed.
