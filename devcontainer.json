@@ -61,7 +61,8 @@
     ],
     "runArgs": [
         "--network=host",
-        "--add-host", "gscloud.local:127.0.0.1"
+        "--add-host", "gscloud.local:127.0.0.1",
+        "--security-opt=seccomp=unconfined"
     ],
     "containerEnv": {
         // the user's home directory on the host machine

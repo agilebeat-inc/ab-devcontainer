@@ -9,7 +9,7 @@ WORKDIR /tmp
 # - networking utilties
 RUN apt-get update && \
   apt-get install -y \
-  ca-certificates curl git jq less locales sudo unzip vim wget \
+  bubblewrap ca-certificates curl git jq less locales strace sudo unzip vim wget \
   bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && locale-gen \
