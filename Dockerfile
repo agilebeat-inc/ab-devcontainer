@@ -4,12 +4,15 @@ LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marches
 
 WORKDIR /tmp 
 
+# Codex's bundled bwrap handles Docker's masked /proc paths. Debian's bwrap
+# 0.12.0 takes precedence and prevents Codex's /proc fallback from running.
+# The container also needs seccomp rules that permit bwrap's user namespaces.
 # adding
 # - locales fiddling since psql complains otherwise (and it's good to have a locale properly set)
 # - networking utilties
 RUN apt-get update && \
   apt-get install -y \
-  bubblewrap ca-certificates curl git jq less locales strace sudo unzip vim wget \
+  ca-certificates curl git jq less locales strace sudo unzip vim wget \
   bind9-dnsutils iproute2 iputils-ping lsof netcat-openbsd nmap traceroute \
   && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
   && locale-gen \

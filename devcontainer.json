@@ -62,7 +62,8 @@
     "runArgs": [
         "--network=host",
         "--add-host", "gscloud.local:127.0.0.1",
-        "--security-opt=seccomp=unconfined"
+        // Moby's default seccomp profile with the namespace and mount calls Codex's bundled bwrap needs.
+        "--security-opt=seccomp=${localWorkspaceFolder}/.devcontainer/seccomp-codex.json"
     ],
     "containerEnv": {
         // the user's home directory on the host machine
