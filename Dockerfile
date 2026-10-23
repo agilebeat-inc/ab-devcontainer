@@ -1,4 +1,4 @@
-FROM golang:1.27.2-trixie
+FROM golang:1.27.3-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -73,7 +73,7 @@ RUN go install -v golang.org/x/tools/gopls@latest && \
 # ********************************************************
 # * Install helm                                         *
 # ********************************************************
-COPY --from=alpine/helm:4.3.0 /usr/bin/helm /usr/local/bin/helm        
+COPY --from=alpine/helm:4.3.1 /usr/bin/helm /usr/local/bin/helm        
 
 # ********************************************************
 # * Install kubectl                                      *
@@ -155,11 +155,11 @@ RUN export ARCH=$(uname -m) && \
 # * Install uv + python             *
 # ***********************************
 # note: default python in uv 0.13+ is 3.15
-COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
-RUN uv python install 3.14 && \
-    ln -s "$(uv python find 3.14)" /usr/local/bin/python3 && \
-    ln -s "$(uv python find 3.14)" /usr/local/bin/python
+RUN uv python install 3.15 && \
+    ln -s "$(uv python find 3.15)" /usr/local/bin/python3 && \
+    ln -s "$(uv python find 3.15)" /usr/local/bin/python
 
 ENV PATH="${HOST_HOME}/.local/bin:${PATH}"
 USER $HOST_USERNAME

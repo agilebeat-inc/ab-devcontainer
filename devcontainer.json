@@ -52,7 +52,7 @@
     "initializeCommand": [
         "bash",
         "-lc",
-        "mkdir -p ~/.aws ~/.kube ~/.ab-kind ~/.ssh && touch ~/.aws/credentials"
+        "mkdir -p ~/.aws ~/.kube ~/.ab-kind ~/.ssh \"${localWorkspaceFolder}/.devcontainer/.codex-home\" && touch ~/.aws/credentials"
     ],
     "postStartCommand": [
         "/bin/sh",
@@ -65,7 +65,11 @@
     ],
     "containerEnv": {
         // the user's home directory on the host machine
-        "DOCKER_HOME_FOLDER_ON_HOST": "${localEnv:HOME}"
+        "DOCKER_HOME_FOLDER_ON_HOST": "${localEnv:HOME}",
+        "CODEX_HOME": "${containerWorkspaceFolder}/.devcontainer/.codex-home"
+    },
+    "remoteEnv": {
+        "CODEX_HOME": "${containerWorkspaceFolder}/.devcontainer/.codex-home"
     },
     "portsAttributes": {
         "3306": {
