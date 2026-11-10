@@ -158,7 +158,7 @@ RUN export ARCH=$(uname -m) && \
 # * Install uv + python             *
 # ***********************************
 # note: default python in uv 0.13+ is 3.15
-COPY --from=ghcr.io/astral-sh/uv:0.13.5 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.15 && \
     ln -s "$(uv python find 3.15)" /usr/local/bin/python3 && \
