@@ -1,4 +1,4 @@
-FROM golang:1.27.3-trixie
+FROM golang:1.27.4-trixie
 
 LABEL org.opencontainers.image.authors="Marek.Dwulit@agilebeat.com,Scott.Marchese@agilebeat.com"
 
@@ -54,7 +54,7 @@ RUN groupadd --gid $HOST_GID $HOST_GROUPNAME \
 # ********************************************************
 # install terraform - see https://developer.hashicorp.com/terraform/install#linux
 # ********************************************************
-COPY --from=hashicorp/terraform:1.16 /bin/terraform /usr/local/bin/terraform
+COPY --from=hashicorp/terraform:1.17 /bin/terraform /usr/local/bin/terraform
 
 # ********************************************************
 # * Install go utils                                     *
@@ -158,7 +158,7 @@ RUN export ARCH=$(uname -m) && \
 # * Install uv + python             *
 # ***********************************
 # note: default python in uv 0.13+ is 3.15
-COPY --from=ghcr.io/astral-sh/uv:0.13.7 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.13.8 /uv /uvx /usr/local/bin/
 ENV UV_PYTHON_INSTALL_DIR=/usr/local/share/uv/python
 RUN uv python install 3.15 && \
     ln -s "$(uv python find 3.15)" /usr/local/bin/python3 && \
