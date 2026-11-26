@@ -49,6 +49,7 @@
         "source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind",
         "source=${localEnv:HOME}/.kube,target=/home/vscode/.kube,type=bind",
         "source=${localEnv:HOME}/.codex,target=/home/vscode/.codex,type=bind",
+        "source=${localEnv:HOME}/.claude,target=/home/vscode/.claude,type=bind",
         "source=${localEnv:HOME}/.ab-kind,target=/home/vscode/.ab-kind,type=bind",
         "source=${localEnv:HOME}/.ab-kind,target=${localEnv:HOME}/.ab-kind,type=bind",
         "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
@@ -59,7 +60,7 @@
     "initializeCommand": [
         "bash",
         "-lc",
-        "mkdir -p ~/.aws ~/.ssh ~/.kube ~/.ab-kind ~/.codex && touch ~/.aws/credentials ~/.kube/config"
+        "mkdir -p ~/.aws ~/.ssh ~/.kube ~/.ab-kind ~/.codex ~/.claude && touch ~/.aws/credentials ~/.kube/config"
     ],
     "postStartCommand": "sudo chown $(id -u).$(id -u) /var/run/docker.sock",
     "runArgs": [
