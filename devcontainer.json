@@ -31,7 +31,8 @@
                 "golang.go",
                 "ms-kubernetes-tools.vscode-kubernetes-tools",
                 "Continue.continue",
-                "openai.chatgpt"
+                "openai.chatgpt",
+                "Anthropic.claude-code"
             ]
         }
     },
